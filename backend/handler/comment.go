@@ -247,7 +247,7 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 		c.base.log.Debug().Msgf("直接评论")
 	}
 	c.base.log.Debug().Msgf("TargetEmail: %s", targetEmail)
-	if err := mail.VerifyEmail(targetEmail); err != nil {
+	if err := mail.VerifyEmail(c.base.log, targetEmail); err != nil {
 		return err
 	}
 	c.base.log.Debug().Msgf("邮箱验证成功")
@@ -256,7 +256,7 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 	c.base.log.Debug().Msgf("SmtpHost: %s", sysConfigVO.SmtpHost)
 	c.base.log.Debug().Msgf("SmtpPort: %s", sysConfigVO.SmtpPort)
 	c.base.log.Debug().Msgf("SmtpUsername: %s", sysConfigVO.SmtpUsername)
-	client, err := mail.GetSMTPClient(sysConfigVO.SmtpHost, sysConfigVO.SmtpPort, sysConfigVO.SmtpUsername, sysConfigVO.SmtpPassword)
+	client, err := mail.GetSMTPClient(c.base.log, sysConfigVO.SmtpHost, sysConfigVO.SmtpPort, sysConfigVO.SmtpUsername, sysConfigVO.SmtpPassword)
 	if err != nil {
 		return err
 	}
@@ -270,6 +270,7 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 	} else { // 直接评论
 		poster = user.Nickname
 	}
+	c.base.log.Debug().Msgf("Host: %s", host)
 	data := mail.CommentNotificationEmailData{
 		Title:     sysConfigVO.Title,
 		Host:      host,

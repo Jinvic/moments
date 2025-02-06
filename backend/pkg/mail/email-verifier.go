@@ -4,22 +4,23 @@ import (
 	"errors"
 
 	emailverifier "github.com/AfterShip/email-verifier"
+	"github.com/rs/zerolog"
 )
 
 var (
 	verifier = emailverifier.NewVerifier()
 )
 
-func VerifyEmail(email string) error {
+func VerifyEmail(logger zerolog.Logger, email string) error {
 
 	ret, err := verifier.Verify(email)
 	if err != nil {
-		c.base.log.Debug().Msgf("email-verifier: 验证邮箱失败" + err.Error())
+		logger.Debug().Msgf("email-verifier: 验证邮箱失败 %v", err.Error())
 		return errors.New("验证邮箱失败" + err.Error())
 	}
 
 	if !ret.Syntax.Valid {
-		c.base.log.Debug().Msgf("email-verifier: 邮箱格式不正确")
+		logger.Debug().Msgf("email-verifier: 邮箱格式不正确")
 		return errors.New("邮箱格式不正确")
 	}
 
