@@ -232,21 +232,30 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 
 	// 未开启邮件通知
 	if !sysConfigVO.EnableEmail {
+		c.base.log.Debug().Msgf("未开启邮件通知")
 		return nil
 	}
+	c.base.log.Debug().Msgf("已开启邮件通知")
 
 	// 验证邮箱是否可用
 	var targetEmail string
 	if comment.ReplyTo != "" { // 回复评论
 		targetEmail = comment.ReplyEmail
+		c.base.log.Debug().Msgf("回复评论")
 	} else { // 直接评论
 		targetEmail = user.Email
+		c.base.log.Debug().Msgf("直接评论")
 	}
+	c.base.log.Debug().Msgf("TargetEmail: %s", targetEmail)
 	if err := mail.VerifyEmail(targetEmail); err != nil {
 		return err
 	}
+	c.base.log.Debug().Msgf("邮箱验证成功")
 
 	// 获取smtp客户端
+	c.base.log.Debug().Msgf("SmtpHost: %s", sysConfigVO.SmtpHost)
+	c.base.log.Debug().Msgf("SmtpPort: %s", sysConfigVO.SmtpPort)
+	c.base.log.Debug().Msgf("SmtpUsername: %s", sysConfigVO.SmtpUsername)
 	client, err := mail.GetSMTPClient(sysConfigVO.SmtpHost, sysConfigVO.SmtpPort, sysConfigVO.SmtpUsername, sysConfigVO.SmtpPassword)
 	if err != nil {
 		return err

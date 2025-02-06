@@ -14,10 +14,12 @@ func VerifyEmail(email string) error {
 
 	ret, err := verifier.Verify(email)
 	if err != nil {
+		c.base.log.Debug().Msgf("email-verifier: 验证邮箱失败" + err.Error())
 		return errors.New("验证邮箱失败" + err.Error())
 	}
 
 	if !ret.Syntax.Valid {
+		c.base.log.Debug().Msgf("email-verifier: 邮箱格式不正确")
 		return errors.New("邮箱格式不正确")
 	}
 
