@@ -290,7 +290,7 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 	to := []string{targetEmail}
 	subject := sysConfigVO.Title
 	domain := mail.GetDomain(sysConfigVO.SmtpUsername)
-	email := fmt.Sprintf(
+	emailHead := fmt.Sprintf(
 		"From: %s\r\n"+
 			"To: %s\r\n"+
 			"Subject: %s\r\n"+
@@ -298,9 +298,9 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 			"Message-ID: <"+time.Now().Format("20060102150405")+"@%s>\r\n"+
 			"MIME-Version: 1.0\r\n"+
 			"Content-Type: text/html; charset=utf-8\r\n"+
-			"\r\n"+
-			"%s",
-		from, to, subject, domain, emailbody)
+			"\r\n", from, to, subject, domain)
+	email := emailHead + emailbody
+	c.base.log.Debug().Msgf("EmailHead:\n%s", emailHead)
 
 	// 发送邮件
 	if err := client.SendMail(from, to, strings.NewReader(email)); err != nil {

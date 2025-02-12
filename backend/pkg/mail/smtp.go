@@ -16,12 +16,14 @@ func GetSMTPClient(logger zerolog.Logger, host, port, username, password string)
 	}
 
 	// 连接到SMTP服务器
+	logger.Debug().Msgf("smtp: 尝试DialTLS连接...")
 	client, err := smtp.DialTLS(host+":"+port, tlsConfig)
 	if err != nil {
-		logger.Debug().Msgf("smtp: DialTLS连接失败")
+		logger.Debug().Msgf("smtp: DialTLS连接失败: %v", err)
+		logger.Debug().Msgf("smtp: 尝试DialStartTLS连接...")
 		client, err = smtp.DialStartTLS(host+":"+port, tlsConfig)
 		if err != nil {
-			logger.Debug().Msgf("smtp: DialStartTLS连接失败")
+			logger.Debug().Msgf("smtp: DialStartTLS连接失败: %v", err)
 			return nil, fmt.Errorf("无法连接到SMTP服务器: %v", err)
 		}
 	}
