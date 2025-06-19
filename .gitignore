@@ -17,3 +17,5 @@ logs
 upload
 *.sqlite
 moments.exe
+
+.vscode

@@ -1,11 +1,9 @@
-name: Build And Upload Image For Release
+name: Build And Upload Image
 on:
   push:
-    tags:
-      - v*
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
+    branches:
+      - 'ci/feat/*'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,24 +19,25 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER_NAME }}
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
-      - name: Extract Version
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      - name: Extract Image Tag
         run: |
-          echo VERSION_TAG=latest >> $GITHUB_ENV
-          echo VERSION=${GITHUB_REF#refs/tags/v} >> $GITHUB_ENV
+          BRANCH_NAME=$(echo ${{ github.ref }} | sed 's/refs\/heads\/ci\///; s/\//_/g') # 去掉前缀并替换斜杠为下划线
+          DATE=$(date +%d%m%y) # 获取当前日期格式为DDMMYY
+          echo "IMAGE_TAG=${BRANCH_NAME}_${DATE}" >> $GITHUB_ENV
+      - name: Extract Version and Commit ID
+        run: |
+          echo VERSION=test >> $GITHUB_ENV
           echo COMMIT_ID=${GITHUB_SHA:0:7} >> $GITHUB_ENV
       - name: Build and Push Image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v6 
         with:
           push: true
           context: .
           platforms: |
             linux/amd64
             linux/arm64
-            linux/arm/v7
           tags: |
-            ${{ secrets.DOCKER_USER_NAME }}/moments:${{ env.VERSION_TAG }}
-            ${{ secrets.DOCKER_USER_NAME }}/moments:${{ env.VERSION }}
+            ${{ secrets.DOCKER_USER_NAME }}/moments:${{ env.IMAGE_TAG }}
           build-args: |
             VERSION=${{ env.VERSION }}
             COMMIT_ID=${{ env.COMMIT_ID }}
