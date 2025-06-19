@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - 'ci/feat/*'
+    workflow_dispatch:
 
 jobs:
   build:
