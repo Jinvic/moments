@@ -24,7 +24,7 @@ jobs:
         run: |
           BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's|refs/heads/ci/||; s|/|-|g' | tr '[:upper:]' '[:lower:]')
           DATE=$(date +%d%m%y) # 获取当前日期格式为DDMMYY
-          echo "IMAGE_TAG=${BRANCH_NAME}_${DATE}" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${BRANCH_NAME}-${DATE}" >> $GITHUB_ENV
       - name: Extract Version and Commit ID
         run: |
           echo VERSION=test >> $GITHUB_ENV
